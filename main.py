@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+from langchain_openAI import ChatOpenAI
 
 message = input("Enter a message for the Search: ")
 if not message.strip():
