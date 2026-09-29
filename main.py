@@ -7,3 +7,5 @@ from pypdf import PdfReader
 load_dotenv()
 
 print("📄 Reading PDF...")
+reader = PdfReader("JavaScript-Interview-Questions-Answers.pdf")
+pdf_content = "\n".join([page.extract_text() for page in reader.pages if page.extract_text()])
