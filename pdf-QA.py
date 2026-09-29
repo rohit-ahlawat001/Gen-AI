@@ -24,3 +24,15 @@ final_output = prompt_template.format_messages(
     context=pdf_content, 
     question=user_question
 )
+
+# 5. Initialize the Gemini LLM
+# Note: Google's standard recommended model names are "gemini-1.5-flash" or "gemini-2.5-flash"
+llm = GoogleGenerativeAI(model="gemini-3.5-flash-lite")
+
+# 6. Run the model and view the response
+print("🤖 Thinking...")
+result = llm.invoke(final_output)
+
+print("\n--- Answer ---")
+# parser = StrOutputParser()
+print(result)
