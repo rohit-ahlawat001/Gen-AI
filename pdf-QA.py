@@ -18,3 +18,9 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("system", "You are a personal assistant happy to help answer questions based strictly on the provided context."),
     ("user", "Here is the PDF content:\n\n{context}\n\nQuestion: {question}")
 ])
+
+# 4. Fill the template with the actual PDF data and the question
+final_output = prompt_template.format_messages(
+    context=pdf_content, 
+    question=user_question
+)
