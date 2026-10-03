@@ -19,6 +19,9 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("user", "Here is the PDF content:\n\n{context}\n\nQuestion: {question}")
 ])
 
+#Pdf Chunking code spiltting the code
+
+
 # 4. Fill the template with the actual PDF data and the question
 final_output = prompt_template.format_messages(
     context=pdf_content, 
