@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from pypdf import PdfReader
-
-
+from langchain_text_splitter import Recursive
 print("📄 Reading PDF...")
 reader = PdfReader("JavaScript-Interview-Questions-Answers.pdf")
 pdf_content = "\n".join([page.extract_text() for page in reader.pages if page.extract_text()])
@@ -20,8 +19,7 @@ prompt_template = ChatPromptTemplate.from_messages([
 ])
 
 #Pdf Chunking code spiltting the code
-
-
+text_splitter = Recur
 # 4. Fill the template with the actual PDF data and the question
 final_output = prompt_template.format_messages(
     context=pdf_content, 
