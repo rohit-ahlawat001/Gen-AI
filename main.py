@@ -7,3 +7,5 @@ from pypdf import PdfReader
 load_dotenv()
 
 loader = PdfReader("LangChain_Beginner_Study_Guide.pdf")
+docs = loader
+print(docs)
