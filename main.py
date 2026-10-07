@@ -6,6 +6,9 @@ from pypdf import PdfReader
 
 load_dotenv()
 
-loader = PdfReader("LangChain_Beginner_Study_Guide.pdf")
-docs = loader
-print(docs)
+reader = PdfReader("LangChain_Beginner_Study_Guide.pdf")
+# docs = loader
+text = ""
+for page in reader.pages:
+    text += page.extract_text()
+print(text[:2000])  # Print the first 2000 characters of the extracted text
