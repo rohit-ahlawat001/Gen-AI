@@ -21,3 +21,5 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 chunks = text_splitter.split_text(text)
+print("Total chunks:", len(chunks))
+print(chunks[0])
