@@ -21,7 +21,7 @@ huggingface-hub
 # Environment Variable Management
 python-dotenv
 pypdf
-
+RecursiveCharacterTextSplitter
 # Machine Learning Utilities
 numpy
 scikit-learn
