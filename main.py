@@ -1,11 +1,17 @@
 import os
 from dotenv import load_dotenv
-# from langchain_google_genai import GoogleGenerativeAI
+from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
+
+llm = GoogleGenerativeAI(
+    model="gemini-3.8-flash"
+)
+
+print(llm)
 
 reader = PdfReader("LangChain_Beginner_Study_Guide.pdf")
 # docs = loader
@@ -15,8 +21,8 @@ for page in reader.pages:
 # print(text[:200])  # Print the first 2000 characters of the extracted text
 
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,
+    chunk_size=500,
+    chunk_overlap=50,
     # length_function=len
 )
 
