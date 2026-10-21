@@ -38,7 +38,7 @@ def split_text(text):
     """Split text into chunks without breaking paragraphs when possible."""
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
-        chunk_overlap=200,
+        chunk_overlap=150,
     )
     return text_splitter.split_text(text)
 
