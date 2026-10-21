@@ -1,36 +1,75 @@
-# Beginner LangChain Message Project
+# Beginner PDF Question & Answer App
 
-A small Python command-line program that sends one message to an OpenAI chat model through LangChain and prints the reply.
+Ask questions about `LangChain_Beginner_Study_Guide.pdf`. The program reads the PDF and uses Gemini to answer from its contents.
 
-## 1. Create and activate a virtual environment
+## What this project does
 
-In PowerShell, open this project folder and run:
+1. Reads the text from the PDF.
+2. Splits long text into smaller chunks.
+3. Finds the chunks that best match your question.
+4. Sends those chunks and your question to Gemini.
+5. Prints Gemini's answer.
+
+## Why this is useful
+
+An AI model cannot reliably use a whole large PDF in every request. Chunks keep the request smaller and help the model focus on the useful part of the document. This is the basic idea behind a PDF chatbot.
+
+## Setup
+
+### 1. Install Python
+
+Install Python 3.12 or 3.13 and select **Add Python to PATH** during installation. Close and reopen PowerShell, then check:
+
+```powershell
+python --version
+```
+
+### 2. Create and activate a virtual environment
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-## 2. Install the packages
+If the existing `.venv` gives an error, delete that `.venv` folder first and run these commands again.
+
+### 3. Install the packages
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-## 3. Add your OpenAI API key
+### 4. Add your Gemini API key
 
-Copy the example environment file and edit the copy:
+Create a file called `.env` in this folder and add:
 
-```powershell
-Copy-Item .env.example .env
+```text
+GOOGLE_API_KEY=your_google_api_key_here
 ```
 
-Open `.env` and replace the example value with your OpenAI API key. Keep `.env` private; it is excluded from Git.
+Never upload `.env` to GitHub.
 
-## 4. Run the project
+### 5. Run the project
 
 ```powershell
 python main.py
 ```
 
-Type a message when prompted. The program sends it to the `gpt-4o-mini` model and prints the response.
+Ask a question, for example:
+
+```text
+What is LangChain?
+```
+
+Type `exit` when you are finished.
+
+## How the code works
+
+- `read_pdf()` gets text from every page of the PDF.
+- `split_text()` breaks that text into chunks of 1,000 characters.
+- `get_relevant_text()` picks the three chunks containing the most words from your question.
+- `llm.invoke()` sends the selected text and question to Gemini.
+
+## Next improvement
+
+This project uses simple word matching so that the logic is easy to learn. The next step is to replace it with embeddings and a vector database such as Chroma. That will find related ideas even when the question uses different words than the PDF.
