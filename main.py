@@ -1,38 +1,94 @@
 import os
+import re
+
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pypdf import PdfReader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-# from langchain_chroma import Chroma
 
-load_dotenv()
 
-llm = GoogleGenerativeAI(
-    model="gemini-3.8-flash"
-)
+PDF_FILE = "LangChain_Beginner_Study_Guide.pdf"
+CHUNK_SIZE = 1000
+NUMBER_OF_CHUNKS = 3
 
-print(llm)
 
-reader = PdfReader("LangChain_Beginner_Study_Guide.pdf")
-# docs = loader
-text = ""
-for page in reader.pages:
-    text += page.extract_text()
-# print(text[:200])  # Print the first 2000 characters of the extracted text
+def read_pdf(file_name):
+    """Read all text from a PDF file."""
+    reader = PdfReader(file_name)
+    pages = []
 
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50,
-    # length_function=len
-)
+    for page in reader.pages:
+        page_text = page.extract_text() or ""
+        pages.append(page_text)
 
-chunks = text_splitter.split_text(text)
-# print("Total chunks:", len(chunks))
-# print(chunks[0])
-vectors = model.embed_documents(chunks)
+    return "\n".join(pages)
 
-print("Total chunks:", len(chunks))
-print("Total vectors:", len(vectors))
-print("First vector dimensions:", len(vectors[0]))
+
+def split_text(text):
+    """Split a long PDF into smaller pieces."""
+    return [text[start:start + CHUNK_SIZE] for start in range(0, len(text), CHUNK_SIZE)]
+
+
+def get_relevant_text(chunks, question):
+    """Choose chunks that contain the most words from the question."""
+    question_words = set(re.findall(r"[a-zA-Z]{3,}", question.lower()))
+
+    ranked_chunks = sorted(
+        chunks,
+        key=lambda chunk: sum(word in chunk.lower() for word in question_words),
+        reverse=True,
+    )
+
+    return "\n\n".join(ranked_chunks[:NUMBER_OF_CHUNKS])
+
+
+def main():
+    load_dotenv()
+
+    if not os.getenv("GOOGLE_API_KEY"):
+        print("GOOGLE_API_KEY is missing. Add it to your .env file.")
+        return
+
+    if not os.path.exists(PDF_FILE):
+        print(f"PDF file not found: {PDF_FILE}")
+        return
+
+    print("Reading the PDF...")
+    pdf_text = read_pdf(PDF_FILE)
+
+    if not pdf_text.strip():
+        print("No readable text was found in the PDF.")
+        return
+
+    chunks = split_text(pdf_text)
+    print(f"PDF is ready. Created {len(chunks)} chunks.")
+
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
+    while True:
+        question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
+
+        if question.lower() == "exit":
+            print("Goodbye!")
+            break
+
+        if not question:
+            print("Please type a question.")
+            continue
+
+        context = get_relevant_text(chunks, question)
+        prompt = f"""Answer the question using only the PDF context below.
+If the answer is not in the context, say: I could not find that in the PDF.
+
+PDF context:
+{context}
+
+Question: {question}
+"""
+
+        print("Thinking...")
+        response = llm.invoke(prompt)
+        print(f"\nAnswer:\n{response.content}")
+
+
+if __name__ == "__main__":
+    main()
