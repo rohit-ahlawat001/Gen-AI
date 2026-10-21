@@ -4,6 +4,8 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# from langchain_chroma import Chroma
 
 load_dotenv()
 
@@ -27,5 +29,10 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 chunks = text_splitter.split_text(text)
+# print("Total chunks:", len(chunks))
+# print(chunks[0])
+vectors = model.embed_documents(chunks)
+
 print("Total chunks:", len(chunks))
-print(chunks[0])
+print("Total vectors:", len(vectors))
+print("First vector dimensions:", len(vectors[0]))
