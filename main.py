@@ -1,8 +1,7 @@
-import os
-import re
-
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_chroma import Chroma
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
 
@@ -24,59 +23,42 @@ def read_pdf(file_name):
 
 
 def split_text(text):
-    """Split a long PDF into smaller pieces."""
-    return [text[start:start + CHUNK_SIZE] for start in range(0, len(text), CHUNK_SIZE)]
-
-
-def get_relevant_text(chunks, question):
-    """Choose chunks that contain the most words from the question."""
-    question_words = set(re.findall(r"[a-zA-Z]{3,}", question.lower()))
-
-    ranked_chunks = sorted(
-        chunks,
-        key=lambda chunk: sum(word in chunk.lower() for word in question_words),
-        reverse=True,
+    """Split text into chunks without breaking paragraphs when possible."""
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=200,
     )
+    return text_splitter.split_text(text)
 
-    return "\n\n".join(ranked_chunks[:NUMBER_OF_CHUNKS])
 
+load_dotenv()
 
-def main():
-    load_dotenv()
+print("Reading the PDF...")
+pdf_text = read_pdf(PDF_FILE)
+chunks = split_text(pdf_text)
+print(f"PDF is ready. Created {len(chunks)} chunks.")
 
-    if not os.getenv("GOOGLE_API_KEY"):
-        print("GOOGLE_API_KEY is missing. Add it to your .env file.")
-        return
+# Create embeddings and store the PDF chunks in Chroma vector database.
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-2.5-flash")
+vector_store = Chroma.from_texts(
+    texts=chunks,
+    embedding=embeddings,
+    collection_name="pdf_chunks",
+)
 
-    if not os.path.exists(PDF_FILE):
-        print(f"PDF file not found: {PDF_FILE}")
-        return
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
-    print("Reading the PDF...")
-    pdf_text = read_pdf(PDF_FILE)
+while True:
+    question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
 
-    if not pdf_text.strip():
-        print("No readable text was found in the PDF.")
-        return
+    if question.lower() == "exit":
+        print("Goodbye!")
+        break
 
-    chunks = split_text(pdf_text)
-    print(f"PDF is ready. Created {len(chunks)} chunks.")
-
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-
-    while True:
-        question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
-
-        if question.lower() == "exit":
-            print("Goodbye!")
-            break
-
-        if not question:
-            print("Please type a question.")
-            continue
-
-        context = get_relevant_text(chunks, question)
-        prompt = f"""Answer the question using only the PDF context below.
+    # Chroma finds the chunks closest in meaning to the question.
+    relevant_documents = vector_store.similarity_search(question, k=NUMBER_OF_CHUNKS)
+    context = "\n\n".join(document.page_content for document in relevant_documents)
+    prompt = f"""Answer the question using only the PDF context below.
 If the answer is not in the context, say: I could not find that in the PDF.
 
 PDF context:
@@ -85,10 +67,6 @@ PDF context:
 Question: {question}
 """
 
-        print("Thinking...")
-        response = llm.invoke(prompt)
-        print(f"\nAnswer:\n{response.content}")
-
-
-if __name__ == "__main__":
-    main()
+    print("Thinking...")
+    response = llm.invoke(prompt)
+    print(f"\nAnswer:\n{response.content}")

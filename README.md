@@ -6,13 +6,14 @@ Ask questions about `LangChain_Beginner_Study_Guide.pdf`. The program reads the 
 
 1. Reads the text from the PDF.
 2. Splits long text into smaller chunks.
-3. Finds the chunks that best match your question.
-4. Sends those chunks and your question to Gemini.
-5. Prints Gemini's answer.
+3. Creates embeddings and stores the chunks in Chroma vector database.
+4. Finds the chunks closest in meaning to your question.
+5. Sends those chunks and your question to Gemini.
+6. Prints Gemini's answer.
 
 ## Why this is useful
 
-An AI model cannot reliably use a whole large PDF in every request. Chunks keep the request smaller and help the model focus on the useful part of the document. This is the basic idea behind a PDF chatbot.
+An AI model cannot reliably use a whole large PDF in every request. Chunks keep the request smaller and help the model focus on the useful part of the document. Chroma uses embeddings to find similar meaning, so a question does not need to use the exact same words as the PDF.
 
 ## Setup
 
@@ -66,10 +67,12 @@ Type `exit` when you are finished.
 ## How the code works
 
 - `read_pdf()` gets text from every page of the PDF.
-- `split_text()` breaks that text into chunks of 1,000 characters.
-- `get_relevant_text()` picks the three chunks containing the most words from your question.
+- `RecursiveCharacterTextSplitter` breaks text into chunks of 1,000 characters while trying to keep paragraphs together. Each chunk overlaps by 100 characters, so important text at a chunk boundary is not lost.
+- `GoogleGenerativeAIEmbeddings` converts each chunk into numbers that represent its meaning.
+- `Chroma` stores those embeddings in a vector database.
+- `similarity_search()` gets the three chunks most related to your question.
 - `llm.invoke()` sends the selected text and question to Gemini.
 
-## Next improvement
+## Important
 
-This project uses simple word matching so that the logic is easy to learn. The next step is to replace it with embeddings and a vector database such as Chroma. That will find related ideas even when the question uses different words than the PDF.
+The vector database is in memory. It is built each time you start the program, so the code stays simple and the PDF can be changed without managing old data.
