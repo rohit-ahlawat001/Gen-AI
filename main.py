@@ -1,13 +1,25 @@
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
 
 PDF_FILE = "LangChain_Beginner_Study_Guide.pdf"
 CHUNK_SIZE = 1000
 NUMBER_OF_CHUNKS = 3
+
+
+class PDFAnswer(BaseModel):
+    """Structured answer returned by the question-answering chain."""
+
+    answer: str = Field(description="Answer based only on the supplied PDF context.")
+    found_in_context: bool = Field(
+        description="Whether the answer was found in the supplied PDF context."
+    )
 
 
 def read_pdf(file_name):
@@ -47,6 +59,24 @@ vector_store = Chroma.from_texts(
 )
 
 llm = ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0.3, max_output_tokens=300)
+parser = PydanticOutputParser(pydantic_object=PDFAnswer)
+
+prompt = ChatPromptTemplate.from_template(
+    """Answer the question using only the PDF context below.
+If the answer is not in the context, set `found_in_context` to false and make
+`answer` exactly: I could not find that in the PDF.
+
+{format_instructions}
+
+PDF context:
+{context}
+
+Question: {question}
+"""
+).partial(format_instructions=parser.get_format_instructions())
+
+# The chain formats the prompt, calls Gemini, then converts its JSON to PDFAnswer.
+chain = prompt | llm | parser
 
 while True:
     question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
