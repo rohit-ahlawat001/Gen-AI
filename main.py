@@ -9,7 +9,7 @@ from pypdf import PdfReader
 
 
 PDF_FILE = "LangChain_Beginner_Study_Guide.pdf"
-CHUNK_SIZE = 1000
+CHUNK_SIZE = 800
 NUMBER_OF_CHUNKS = 3
 
 
@@ -45,24 +45,29 @@ def split_text(text):
 
 load_dotenv()
 
-# print("Reading the PDF...")
-pdf_text = read_pdf(PDF_FILE)
-chunks = split_text(pdf_text)
-# print(f"PDF is ready. Created {len(chunks)} chunks.")
 
-# Chroma needs an embedding model, not a chat model.
-embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")
-vector_store = Chroma.from_texts(
-    texts=chunks,
-    embedding=embeddings,
-    collection_name="pdf_chunks",
-)
+def create_chatbot():
+    """Load the PDF and create the retrieval and answer chain once."""
+    pdf_text = read_pdf(PDF_FILE)
+    chunks = split_text(pdf_text)
 
-llm = ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0.3, max_output_tokens=300)
-parser = PydanticOutputParser(pydantic_object=PDFAnswer)
+    # Chroma needs an embedding model, not a chat model.
+    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")
+    vector_store = Chroma.from_texts(
+        texts=chunks,
+        embedding=embeddings,
+        collection_name="pdf_chunks",
+    )
 
-prompt = ChatPromptTemplate.from_template(
-    """Answer the question using only the PDF context below.
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-3.7-flash",
+        temperature=0.3,
+        max_output_tokens=300,
+    )
+    parser = PydanticOutputParser(pydantic_object=PDFAnswer)
+
+    prompt = ChatPromptTemplate.from_template(
+        """Answer the question using only the PDF context below.
 If the answer is not in the context, set `found_in_context` to false and make
 `answer` exactly: I could not find that in the PDF.
 
@@ -73,30 +78,37 @@ PDF context:
 
 Question: {question}
 """
-).partial(format_instructions=parser.get_format_instructions())
+    ).partial(format_instructions=parser.get_format_instructions())
 
-# The chain formats the prompt, calls Gemini, then converts its JSON to PDFAnswer.
-chain = prompt | llm | parser
+    # The chain formats the prompt, calls Gemini, then converts JSON to PDFAnswer.
+    chain = prompt | llm | parser
+    return vector_store, chain
 
-while True:
-    question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
 
-    if question.lower() == "exit":
-        print("Goodbye! Have a great day!")
-        break
-
-    # Chroma finds the chunks closest in meaning to the question.
+def ask_question(question, vector_store, chain):
+    """Find relevant PDF content and return one structured answer."""
     relevant_documents = vector_store.similarity_search(question, k=NUMBER_OF_CHUNKS)
     context = "\n\n".join(document.page_content for document in relevant_documents)
-    prompt = f"""Answer the question using only the PDF context below.
-If the answer is not in the context, say: I could not find that in the PDF.
+    return chain.invoke({"context": context, "question": question})
 
-PDF context:
-{context}
 
-Question: {question}
-"""
+def run_terminal_chat():
+    """Keep a simple terminal version of the chatbot."""
+    print("Reading the PDF...")
+    vector_store, chain = create_chatbot()
+    print("You can now ask questions about the PDF. Type 'exit' to quit.")
 
-    print("Thinking...")
-    response = llm.invoke(prompt)
-    print(f"\nAnswer:\n{response.content}")
+    while True:
+        question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
+
+        if question.lower() == "exit":
+            print("Goodbye! Have a great day!")
+            break
+
+        print("Thinking...")
+        response = ask_question(question, vector_store, chain)
+        print(f"\nAnswer:\n{response.answer}")
+
+
+if __name__ == "__main__":
+    run_terminal_chat()
