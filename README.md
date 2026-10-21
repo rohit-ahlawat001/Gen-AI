@@ -73,6 +73,8 @@ Type `exit` when you are finished.
 - `similarity_search()` gets the three chunks most related to your question.
 - `llm.invoke()` sends the selected text and question to Gemini.
 
+The project uses two Gemini models: `gemini-embedding-2` for Chroma search and `gemini-3.1-pro-preview` for answering questions. A chat model cannot create embeddings.
+
 ## Important
 
 The vector database is in memory. It is built each time you start the program, so the code stays simple and the PDF can be changed without managing old data.

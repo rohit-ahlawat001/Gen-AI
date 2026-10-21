@@ -38,21 +38,21 @@ pdf_text = read_pdf(PDF_FILE)
 chunks = split_text(pdf_text)
 print(f"PDF is ready. Created {len(chunks)} chunks.")
 
-# Create embeddings and store the PDF chunks in Chroma vector database.
-embeddings = GoogleGenerativeAIEmbeddings(model="gemini-2.5-flash")
+# Chroma needs an embedding model, not a chat model.
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")
 vector_store = Chroma.from_texts(
     texts=chunks,
     embedding=embeddings,
     collection_name="pdf_chunks",
 )
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0.3, max_output_tokens=300)
 
 while True:
     question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
 
     if question.lower() == "exit":
-        print("Goodbye!")
+        print("Goodbye! Have a great day!")
         break
 
     # Chroma finds the chunks closest in meaning to the question.
