@@ -50,7 +50,15 @@ GOOGLE_API_KEY=your_google_api_key_here
 
 Never upload `.env` to GitHub.
 
-### 5. Run the project
+### 5. Run the Streamlit app
+
+```powershell
+streamlit run app.py
+```
+
+Your browser will open the PDF chatbot. Ask a question in the chat box.
+
+### 6. Run the terminal version (optional)
 
 ```powershell
 python main.py

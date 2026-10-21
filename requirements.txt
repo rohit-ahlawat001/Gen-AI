@@ -1,5 +1,7 @@
 langchain-google-genai
 langchain-chroma
 langchain-text-splitters
+pydantic
 pypdf
 python-dotenv
+streamlit
