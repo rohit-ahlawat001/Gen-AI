@@ -11,7 +11,7 @@ NUMBER_OF_CHUNKS = 3
 
 
 def read_pdf(file_name):
-    """Read all text from a PDF file."""
+    # """Read all text from a PDF file."""
     reader = PdfReader(file_name)
     pages = []
 
@@ -33,10 +33,10 @@ def split_text(text):
 
 load_dotenv()
 
-print("Reading the PDF...")
+# print("Reading the PDF...")
 pdf_text = read_pdf(PDF_FILE)
 chunks = split_text(pdf_text)
-print(f"PDF is ready. Created {len(chunks)} chunks.")
+# print(f"PDF is ready. Created {len(chunks)} chunks.")
 
 # Chroma needs an embedding model, not a chat model.
 embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")
@@ -46,7 +46,7 @@ vector_store = Chroma.from_texts(
     collection_name="pdf_chunks",
 )
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0.3, max_output_tokens=300)
+llm = ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0.3, max_output_tokens=300)
 
 while True:
     question = input("\nAsk a question about the PDF (or type 'exit'): ").strip()
