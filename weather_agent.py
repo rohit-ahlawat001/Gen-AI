@@ -10,3 +10,10 @@ llm = ChatGoogleGenerativeAI(
     max_output_tokens=300,
 )
 
+messages = [
+    ("human", "What is the weather in Noida?")
+]
+
+response = llm.invoke(messages)
+
+print(response.content)
