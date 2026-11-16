@@ -21,7 +21,6 @@ class PDFAnswer(BaseModel):
         description="Whether the answer was found in the supplied PDF context."
     )
 
-
 def read_pdf(file_name):
     # """Read all text from a PDF file."""
     reader = PdfReader(file_name)
