@@ -12,3 +12,4 @@ client = ChatGoogleGenerativeAI(
 
 print("=" * 20)
 print("My AI Asssistant")
+print("=" * 20)
