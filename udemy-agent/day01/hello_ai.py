@@ -9,6 +9,7 @@ client = ChatGoogleGenerativeAI(
         temperature=0.3,
         max_output_tokens=300,
     )
+print(client)
 
 print("=" * 20)
 print("My AI Asssistant")
