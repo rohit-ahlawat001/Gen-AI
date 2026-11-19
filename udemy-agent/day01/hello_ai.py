@@ -25,3 +25,7 @@
 #     response = client.invoke(user_query)
 
 #     print(f"\nAssistant: {response.content}")
+
+
+from langchain_google_genai import GoogleGenerativeAI
+from dotenv import load_dotenv
