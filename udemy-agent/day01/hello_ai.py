@@ -49,3 +49,4 @@ while True:
     )
 
     response = llm.invoke(user_input)
+    print(response)
