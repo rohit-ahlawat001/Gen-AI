@@ -29,3 +29,8 @@
 
 from langchain_google_genai import GoogleGenerativeAI
 from dotenv import load_dotenv
+
+load_dotenv()
+
+print("=" * 30)
+print("My Ai Assistant")
