@@ -49,6 +49,5 @@ while True:
         break
 
     response = llm.invoke(user_input)
-    # print(response)
     print("Getting your Response. Please Wait!")
     print(f"\nAssistant: {response.content}")
