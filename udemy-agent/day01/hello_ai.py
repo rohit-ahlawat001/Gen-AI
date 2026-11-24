@@ -78,10 +78,6 @@ print(message)
 while True:
     user_input = input("\nAsk Something: ")
 
-    message.append({
-        "role": "user",
-        "content": user_input
-    })
 
     if user_input.lower() == "quit":
         print("\nAI: Goodbye! Have a Great Day!")
@@ -89,10 +85,12 @@ while True:
 
     try:
         print("\nGetting your response. Please wait!")
-
-        response = llm.invoke(user_input)
+        message.append({"role": "user", "content": user_input
+        })
+        response = llm.invoke(message)
 
         print(f"\nAssistant: {response}")
+        message.append({"role": "assistant", "content": response})
 
     except Exception as e:
         print(f"\nError: {e}")
