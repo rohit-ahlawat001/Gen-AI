@@ -85,8 +85,10 @@ while True:
 
     try:
         print("\nGetting your response. Please wait!")
-        message.append({"role": "user", "content": user_input
-        })
+        message.append({
+                "role": "user",
+                "content": user_input
+            })
         response = llm.invoke(message)
 
         print(f"\nAssistant: {response}")
