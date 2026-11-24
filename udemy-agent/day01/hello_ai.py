@@ -50,4 +50,6 @@ while True:
      print("\nAI: Goodbye Have A Great Day!")
      break
 
-    response = llm.invoke.user_input()
+    response = llm.invoke(user_input)
+    print("Getting your Response. Please Wait!")
+    print(f"\nAssistant: {response.content}")
