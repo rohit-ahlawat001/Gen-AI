@@ -26,30 +26,73 @@
 
 
 
+# from langchain_google_genai import GoogleGenerativeAI
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# llm = GoogleGenerativeAI(
+#     model="user_input",
+#         temperature=0.3,
+#         max_output_tokens=100,
+# )
+
+# print("=" * 20)
+# print("Persnal Assistant")
+# print("=" * 20)
+
+# print(llm.model)
+
+# while True:
+#     user_input = input("Ask Someting: " )
+
+#     if user_input.lower() == "quit":
+#         print("\nAI: Goodbye Have A Great Day!")
+#         break
+
+#     response = llm.invoke(user_input)
+#     print("Getting your Response. Please Wait!")
+#     print(f"\nAssistant: {response}")
+
+
+
 from langchain_google_genai import GoogleGenerativeAI
 from dotenv import load_dotenv
 
 load_dotenv()
-
+# message = []
 llm = GoogleGenerativeAI(
     model="gemini-3.7-flash",
-        temperature=0.3,
-        max_output_tokens=100,
+    temperature=0.3,
+    max_output_tokens=256,
+    # messages = message
 )
+message = []
 
 print("=" * 20)
-print("Persnal Assistant")
+print("Personal Assistant")
 print("=" * 20)
 
-print(llm.model)
+print(message)
 
 while True:
-    user_input = input("Ask Someting: " )
+    user_input = input("\nAsk Something: ")
+
+    message.append({
+        "role": "user",
+        "content": user_input
+    })
 
     if user_input.lower() == "quit":
-     print("\nAI: Goodbye Have A Great Day!")
-     break
+        print("\nAI: Goodbye! Have a Great Day!")
+        break
 
-    response = llm.invoke(user_input)
-    print("Getting your Response. Please Wait!")
-    print(f"\nAssistant: {response.content}")
+    try:
+        print("\nGetting your response. Please wait!")
+
+        response = llm.invoke(user_input)
+
+        print(f"\nAssistant: {response}")
+
+    except Exception as e:
+        print(f"\nError: {e}")
