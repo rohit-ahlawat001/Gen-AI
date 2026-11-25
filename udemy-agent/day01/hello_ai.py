@@ -56,24 +56,31 @@
 
 
 
-from langchain_google_genai import GoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 # message = []
-llm = GoogleGenerativeAI(
-    model="gemini-3.7-flash",
+llm = ChatGoogleGenerativeAI(
+    model="gemini-3.5-flash-lite",
     temperature=0.3,
-    max_output_tokens=256,
+    max_output_tokens=100,
     # messages = message
 )
+
+# llm = OpenAI(
+#     model= "gpt-5.4-mini",
+#     temperature= 0.3,
+#     max_tokens= 50
+# )
 message = []
 
 print("=" * 20)
 print("Personal Assistant")
 print("=" * 20)
 
-print(message)
+# print(message)
 
 while True:
     user_input = input("\nAsk Something: ")
@@ -92,7 +99,7 @@ while True:
         response = llm.invoke(message)
 
         print(f"\nAssistant: {response}")
-        message.append({"role": "assistant", "content": response})
+        message.append({"role": "assistant", "content": response.content})
 
     except Exception as e:
         print(f"\nError: {e}")
