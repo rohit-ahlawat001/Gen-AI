@@ -98,7 +98,7 @@ while True:
             })
         response = llm.invoke(message)
 
-        print(f"\nAssistant: {response}")
+        print(f"\nAssistant: {response.content}")
         message.append({"role": "assistant", "content": response.content})
 
     except Exception as e:
