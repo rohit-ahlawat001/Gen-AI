@@ -80,8 +80,6 @@ print("=" * 20)
 print("Personal Assistant")
 print("=" * 20)
 
-# print(message)
-
 while True:
     user_input = input("\nAsk Something: ")
 
