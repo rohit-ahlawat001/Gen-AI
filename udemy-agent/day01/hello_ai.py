@@ -75,7 +75,8 @@ llm = ChatGoogleGenerativeAI(
 #     max_tokens= 50
 # )
 message = []
-
+for msg in message:
+    print(msg)
 print("=" * 20)
 print("Personal Assistant")
 print("=" * 20)
@@ -98,6 +99,7 @@ while True:
 
         print(f"\nAssistant: {response.content}")
         message.append({"role": "assistant", "content": response.content})
+        
 
     except Exception as e:
         print(f"\nError: {e}")
