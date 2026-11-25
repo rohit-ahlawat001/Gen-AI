@@ -99,7 +99,7 @@ while True:
 
         print(f"\nAssistant: {response.content}")
         message.append({"role": "assistant", "content": response.content})
-        print(*message, sep="\n")
+        print("Conversation History ===>", *message, sep="\n", )
 
     except Exception as e:
         print(f"\nError: {e}")
