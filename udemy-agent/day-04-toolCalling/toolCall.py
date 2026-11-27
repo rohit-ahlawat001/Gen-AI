@@ -1,0 +1,10 @@
+from datetime import datetime
+import random
+
+def get_time_date():
+    return datetime.now()
+
+# print(get_time_date())
+
+def roll_dic():
+    return random.randint(1,6)
