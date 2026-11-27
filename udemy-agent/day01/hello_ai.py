@@ -99,7 +99,7 @@ while True:
         assistant_response = response.content[0]["text"]
 
         print(f"\nAssistant: {assistant_response}")
-        message.append({"role": "assistant", "content": assistant_response})
+        message.append({"role": "assistant", "content": response.content})
         print("\n" + "=" * 20)
         print("Conversation History")
         print("=" * 20)
