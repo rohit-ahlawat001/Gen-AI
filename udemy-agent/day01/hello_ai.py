@@ -65,7 +65,7 @@ load_dotenv()
 llm = ChatGoogleGenerativeAI(
     model="gemini-3.5-flash-lite",
     temperature=0.3,
-    max_output_tokens=100,
+    max_output_tokens=30,
     # messages = message
 )
 
@@ -96,10 +96,16 @@ while True:
                 "content": user_input
             })
         response = llm.invoke(message)
+        assistant_response = response.content[0]["text"]
 
-        print(f"\nAssistant: {response.content}")
-        message.append({"role": "assistant", "content": response.content})
-        # print("Conversation History ===>", *message, sep="\n", )
+        print(f"\nAssistant: {assistant_response}")
+        message.append({"role": "assistant", "content": assistant_response})
+        print("\n" + "=" * 20)
+        print("Conversation History")
+        print("=" * 20)
 
+        for msg in message:
+                print(f"\n{msg['role'].upper()}:")
+                print(msg['content'])
     except Exception as e:
         print(f"\nError: {e}")
