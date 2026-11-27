@@ -1,0 +1,6 @@
+In the Hello_ai.py we hav the "https://www.udemy.com/course/ai-agent-engineering/learn/lecture/"  this course 
+Day 1 to Day 3 Content
+
+Day 01 :- Just overview of the Courese and the ai
+Day 02:- Build the conversational chatbot and the Added the memory so that conversaction remeber to chatbot
+Day 03:- Learn About the prompt and Added the system prompt in the code. 
