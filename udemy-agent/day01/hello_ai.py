@@ -74,7 +74,10 @@ llm = ChatGoogleGenerativeAI(
 #     temperature= 0.3,
 #     max_tokens= 50
 # )
-message = []
+message = [{
+     "role": "system",
+     "content": "You are an exerienced travel guide"
+}]
 # for msg in message:
 #     print(msg)
 print("=" * 20)
